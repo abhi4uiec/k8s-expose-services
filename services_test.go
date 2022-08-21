@@ -7,6 +7,8 @@ import (
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/gorilla/mux"
 )
 
 type podDetailsStruct struct {
@@ -57,13 +59,12 @@ func TestReturnPodsPerService(t *testing.T) {
 
 func TestReturnPodsPerAppGroup(t *testing.T) {
 
-	req, err := http.NewRequest("GET", "/services", nil)
+	req, err := http.NewRequest("GET", "/services/{applicationGroup}", nil)
 	if err != nil {
 		t.Fatal(err)
 	}
-	q := req.URL.Query()
-	q.Add("applicationGroup", "alpha")
-	req.URL.RawQuery = q.Encode()
+
+	req = mux.SetURLVars(req, map[string]string{"applicationGroup": "alpha"})
 	respRec := httptest.NewRecorder()
 	handler := http.HandlerFunc(returnPodsPerAppGroup)
 	handler.ServeHTTP(respRec, req)

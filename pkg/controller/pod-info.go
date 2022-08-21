@@ -8,7 +8,6 @@ import (
 
 	"github.com/pkg/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 )
 
@@ -21,9 +20,14 @@ type PodDetails struct {
 var log = logf.Log.WithName("controller")
 
 // Prepares a map with key as "service" and value as "applicationGroup", hold details of all pods in the cluster
-func PrepareMap(clientset *kubernetes.Clientset) map[string]string {
+func PrepareMap() map[string]string {
 
 	var podMap = map[string]string{}
+
+	clientset, err := client.PrepareClientSet()
+	if err != nil {
+		log.Error(err, "Unable to create client set")
+	}
 
 	// access the API to list deployments
 	// Need to access deployment, because label applictionGroup is only part of deployment and not pods
